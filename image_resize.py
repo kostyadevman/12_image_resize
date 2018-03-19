@@ -5,7 +5,7 @@ from os.path import basename, splitext, dirname, join
 
 def argument_parser():
     usage = ' img_resize.py [-h] [ [--width WIDTH] [--height HEIGHT] ' \
-            '| --scale SCALE] [--output OUTPUT] --input INPUT'
+            '| [--scale SCALE] [--output OUTPUT] --input INPUT'
     parser = argparse.ArgumentParser(usage=usage)
     parser.add_argument('--width', type=float, help='Output image width')
     parser.add_argument('--scale', type=float, help='Output image  scale')
