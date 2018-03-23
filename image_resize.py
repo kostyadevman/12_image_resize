@@ -13,6 +13,15 @@ def argument_parser():
     parser.add_argument('--output', help='Ouput image path')
     parser.add_argument('--input', required=True, help='Input image')
     args = parser.parse_args()
+    if args.scale and args.width:
+        print('argument --scale: not allowed with argument --width')
+        args=None
+    if args.scale and args.height:
+        print('argument --scale: not allowed with argument --height')
+        args=None
+    if not args.scale and not args.width and not args.height:
+        print('Use --help to see help')
+        args=None
 
     return args
 
@@ -21,9 +30,9 @@ def open_img(path_to_file):
     try:
         image  = Image.open(path_to_file)
     except FileNotFoundError as error:
-        exit(error)
+        print(error)
     except OSError as error:
-        exit(error)
+        print(error)
 
     return image
 
@@ -83,14 +92,14 @@ def resize_image(original_img,  size):
 
 if __name__ == '__main__':
     args = argument_parser()
-    if args.scale and args.width:
-        exit('argument --scale: not allowed with argument --width')
-    if args.scale and args.height:
-        exit('argument --scale: not allowed with argument --height')
-    if not args.scale and not args.width and not args.height:
-        exit('Use --help to see help')
+    if not args:
+        exit()
 
     input_img = open_img(args.input)
+    
+    if not input_img:
+        exit('Open file error')
+
     input_img_size = get_input_img_size(input_img)
     output_img_size = get_output_img_size(
         input_img_size,
