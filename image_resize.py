@@ -14,13 +14,6 @@ def argument_parser():
     parser.add_argument('--input', required=True, help='Input image')
     args = parser.parse_args()
 
-    if args.scale and args.width:
-        exit('argument --scale: not allowed with argument --width')
-    if args.scale and args.height:
-        exit('argument --scale: not allowed with argument --height')
-    if not args.scale and not args.width and not args.height:
-        exit(usage)
-
     return args
 
 
@@ -45,11 +38,11 @@ def get_output_img_dir_name(path_to_input_img, output_size):
     file_name, file_extension = splitext(input_img_name)
     width, height = output_img_size
 
-    return (input_dir, '{}__{}x{}{}'.format(
+    return input_dir, '{}__{}x{}{}'.format(
         file_name,
         int(width),
         int(height),
-        file_extension))
+        file_extension)
 
 
 def is_ratio_match_original(original_size, size):
@@ -78,7 +71,7 @@ def get_output_img_size(original_size, width, height, scale):
     if height and not width:
         width = (original_height / height) * original_width
 
-    return (width, height)
+    return width, height
 
 
 def resize_image(original_img,  size):
@@ -90,6 +83,12 @@ def resize_image(original_img,  size):
 
 if __name__ == '__main__':
     args = argument_parser()
+    if args.scale and args.width:
+        exit('argument --scale: not allowed with argument --width')
+    if args.scale and args.height:
+        exit('argument --scale: not allowed with argument --height')
+    if not args.scale and not args.width and not args.height:
+        exit('Use --help to see help')
 
     input_img = open_img(args.input)
     input_img_size = get_input_img_size(input_img)
