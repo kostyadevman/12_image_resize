@@ -15,20 +15,20 @@ def argument_parser():
     args = parser.parse_args()
     if args.scale and args.width:
         print('argument --scale: not allowed with argument --width')
-        args=None
+        args = None
     if args.scale and args.height:
         print('argument --scale: not allowed with argument --height')
-        args=None
+        args = None
     if not args.scale and not args.width and not args.height:
         print('Use --help to see help')
-        args=None
+        args = None
 
     return args
 
 
 def open_img(path_to_file):
     try:
-        image  = Image.open(path_to_file)
+        image = Image.open(path_to_file)
     except FileNotFoundError as error:
         print(error)
     except OSError as error:
@@ -60,7 +60,7 @@ def is_ratio_match_original(original_size, size):
     width, height = size
     width_ratio = orig_width / width
     height_ratio = orig_height / height
-    return  width_ratio - height_ratio < abs(admissible_error)
+    return width_ratio - height_ratio < abs(admissible_error)
 
 
 def get_input_img_size(original_img):
@@ -96,7 +96,7 @@ if __name__ == '__main__':
         exit()
 
     input_img = open_img(args.input)
-    
+
     if not input_img:
         exit('Open file error')
 
@@ -107,9 +107,10 @@ if __name__ == '__main__':
         args.height,
         args.scale
     )
-    if args.width and args.height:
-        if not is_ratio_match_original(input_img_size, output_img_size):
-            print('Warning: ratio do not  match the original')
+
+    if not is_ratio_match_original(input_img_size, output_img_size):
+        print('Warning: ratio do not  match the original')
+
     output_img = resize_image(input_img, output_img_size)
     output_dir, output_img_name = get_output_img_dir_name(
         args.input,
