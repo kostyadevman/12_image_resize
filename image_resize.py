@@ -64,6 +64,9 @@ def get_output_img_size(original_size, width, height, scale):
 
     if height and not width:
         width = round((original_height / height) * original_width)
+        
+    if not(width and height):
+        width, height = original_size
 
     return width, height
 
@@ -85,10 +88,6 @@ if __name__ == '__main__':
     if scale and (width or height):
         parser.error(
             'Argument --scale not allowed with --width or --height'
-        )
-    if not scale or not width or not height:
-        parser.error(
-            'Point scale or width/height argument'
         )
 
     input_img = open_img(args.input)
