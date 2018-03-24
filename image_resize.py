@@ -86,7 +86,7 @@ if __name__ == '__main__':
         parser.error(
             'Argument --scale not allowed with --width or --height'
         )
-    if not (scale or width or height):
+    if not scale or not width or not height:
         parser.error(
             'Point scale or width/height argument'
         )
