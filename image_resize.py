@@ -3,45 +3,34 @@ from PIL import Image
 from os.path import basename, splitext, dirname, join
 
 
-def argument_parser():
-    usage = ' img_resize.py [-h] [ [--width WIDTH] [--height HEIGHT] ' \
-            '| [--scale SCALE] [--output OUTPUT] --input INPUT'
+def get_argument_parser():
+    usage = (' img_resize.py [-h] [ [--width WIDTH] [--height HEIGHT]' 
+             '| [--scale SCALE] [--output OUTPUT] --input INPUT')
     parser = argparse.ArgumentParser(usage=usage)
-    parser.add_argument('--width', type=float, help='Output image width')
+    parser.add_argument('--width', type=int, help='Output image width')
     parser.add_argument('--scale', type=float, help='Output image  scale')
-    parser.add_argument('--height', type=float, help='Output image height')
+    parser.add_argument('--height', type=int, help='Output image height')
     parser.add_argument('--output', help='Ouput image path')
     parser.add_argument('--input', required=True, help='Input image')
-    args = parser.parse_args()
-    if args.scale and args.width:
-        print('argument --scale: not allowed with argument --width')
-        args = None
-    if args.scale and args.height:
-        print('argument --scale: not allowed with argument --height')
-        args = None
-    if not args.scale and not args.width and not args.height:
-        print('Use --help to see help')
-        args = None
 
-    return args
+    return parser
 
 
 def open_img(path_to_file):
     try:
         image = Image.open(path_to_file)
+        return image
     except FileNotFoundError as error:
-        print(error)
+        pass
     except OSError as error:
-        print(error)
-
-    return image
+        pass
 
 
 def save_img(path_to_save, image):
     image.save(path_to_save)
 
 
-def get_output_img_dir_name(path_to_input_img, output_size):
+def get_output_img_dir_name(path_to_input_img, output_img_size):
     input_dir = dirname(path_to_input_img)
     input_img_name = basename(path_to_input_img)
     file_name, file_extension = splitext(input_img_name)
@@ -49,8 +38,8 @@ def get_output_img_dir_name(path_to_input_img, output_size):
 
     return input_dir, '{}__{}x{}{}'.format(
         file_name,
-        int(width),
-        int(height),
+        width,
+        height,
         file_extension)
 
 
@@ -63,22 +52,18 @@ def is_ratio_match_original(original_size, size):
     return width_ratio - height_ratio < abs(admissible_error)
 
 
-def get_input_img_size(original_img):
-    return original_img.size
-
-
 def get_output_img_size(original_size, width, height, scale):
     original_width, original_height = original_size
 
     if scale:
-        width = original_width * scale
-        height = original_height * scale
+        width = round(original_width * scale)
+        height = round(original_height * scale)
 
     if width and not height:
-        height = (width / original_width) * original_height
+        height = round((width / original_width) * original_height)
 
     if height and not width:
-        width = (original_height / height) * original_width
+        width = round((original_height / height) * original_width)
 
     return width, height
 
@@ -91,21 +76,32 @@ def resize_image(original_img,  size):
 
 
 if __name__ == '__main__':
-    args = argument_parser()
-    if not args:
-        exit()
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    scale = args.scale
+    width = args.width
+    height = args.height
+
+    if scale and (width or height):
+        parser.error(
+            'Argument --scale not allowed with --width or --height'
+        )
+    if not (scale or width or height):
+        parser.error(
+            'Point scale or width/height argument'
+        )
 
     input_img = open_img(args.input)
 
     if not input_img:
-        exit('Open file error')
+        exit('Open image error')
 
-    input_img_size = get_input_img_size(input_img)
+    input_img_size = input_img.size
     output_img_size = get_output_img_size(
         input_img_size,
-        args.width,
-        args.height,
-        args.scale
+        width,
+        height,
+        scale
     )
 
     if not is_ratio_match_original(input_img_size, output_img_size):
@@ -118,9 +114,8 @@ if __name__ == '__main__':
     )
 
     if args.output:
-        path_to_save_output_img = join(args.output, output_img_name)
-    else:
-        path_to_save_output_img = join(output_dir, output_img_name)
+        output_dir = args.output
+    path_to_save_output_img = join(output_dir, output_img_name)
 
-    save_img(path_to_save_output_img, output_img)
+    output_img.save(path_to_save_output_img)
     print('Image saved: {}'.format(path_to_save_output_img))
