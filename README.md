@@ -1,6 +1,6 @@
 # Image Resizer
 
-Resize jpg and png images. Choose width, height to change. Besides to keep the ratio you should use scale optiosn instead width or height. Point the path of the new image or it will be save with the original one.
+Resize jpg and png images. Choose width, height to change. Besides to keep the ratio you should use scale optiosn instead width or height. Point the path of directory to save or it will be save with the original one.
 
 # Quickstart
 
