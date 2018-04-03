@@ -60,17 +60,7 @@ def get_output_img_size(original_size, width, height, scale):
     if height and not width:
         width = round((original_height / height) * original_width)
 
-    if not(width and height):
-        width, height = original_size
-
     return width, height
-
-
-def resize_image(original_img,  size):
-    width, height = size
-    width = width
-    height = height
-    return original_img.resize((width, height))
 
 
 if __name__ == '__main__':
@@ -83,6 +73,10 @@ if __name__ == '__main__':
     if scale and (width or height):
         parser.error(
             'Argument --scale not allowed with --width or --height'
+        )
+    if not scale and not(width or height):
+        parser.error(
+            'Point --scale or --width/--height'
         )
 
     input_img = open_img(args.input)
@@ -101,7 +95,7 @@ if __name__ == '__main__':
     if not is_ratio_match_original(input_img_size, output_img_size):
         print('Warning: ratio do not  match the original')
 
-    output_img = resize_image(input_img, output_img_size)
+    output_img = input_img.resize(output_img_size)
     output_dir, output_img_name = get_output_img_dir_name(
         args.output,
         args.input,
